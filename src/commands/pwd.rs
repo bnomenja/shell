@@ -1,12 +1,12 @@
 pub fn run(args : &[String]) {
     if !args.is_empty() {
-        println!("pwd error: too many arguments");
+        println!("Error: too many arguments");
         return;
     }
 
     match std::env::current_dir() {
         Ok(path) => println!("{}", path.display()),
-        Err(err) => eprintln!("pwd error: {}", err),
+        Err(err) => eprintln!("Error: {}", err),
     };
 
 }

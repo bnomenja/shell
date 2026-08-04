@@ -15,26 +15,98 @@ impl Command {
     }
 }
 
-pub fn parse(input : &str) -> Option<Command> {
-    if input.is_empty(){
-        return None
-    }
+use std::io;
+use std::io::Write;
 
-    let mut cmd = Command::new();
+fn tokenize(input: &str, cmd: &mut Command, buffer: &mut String, in_sgl_quotes: &mut bool, in_dbl_quotes: &mut bool) {
+    let mut escape = false;
 
-    for (i, w) in input.split_whitespace().enumerate() {
-        if i == 0 {
-            cmd.name = w.to_string();
+    for c in input.chars() {
+        if escape {
+            buffer.push(c);
+            escape = false;
             continue;
         }
 
-        if w.starts_with("-") {
-            cmd.options.push_str(&w[1..]);   
-        }else {
-            cmd.args.push(w.to_string());
+        match c {
+            '\\' if !*in_sgl_quotes => escape = true,
+            
+            '\'' if !*in_dbl_quotes => *in_sgl_quotes = !*in_sgl_quotes,
+
+            '"' if !*in_sgl_quotes => *in_dbl_quotes = !*in_dbl_quotes,
+
+            c if c.is_whitespace() && !*in_sgl_quotes && !*in_dbl_quotes => {
+                if !buffer.is_empty() {
+                    if cmd.name.is_empty() {
+                        cmd.name = buffer.clone();
+                    } else if buffer.starts_with('-') {
+                        cmd.options.push_str(&buffer[1..]);
+                    }else{
+                        cmd.args.push(buffer.clone());
+                    }
+                    buffer.clear();
+                }
+            }
+
+            c => buffer.push(c),
+        }
+    }
+}
+
+pub fn parse(input: &str) -> Option<Command> {
+    if input.trim().is_empty() {
+        return None;
+    }
+    
+    let mut cmd = Command::new();
+    let mut in_sgl_quotes = false;
+    let mut in_dbl_quotes = false;
+    let mut buffer = String::new();
+    let mut jump_line =  input.trim_end().ends_with('\\');
+
+    let line = if jump_line { input.trim_end().trim_end_matches('\\') } else { input };    
+
+    tokenize(&line, &mut cmd, &mut buffer, &mut in_sgl_quotes, &mut in_dbl_quotes);
+
+    while in_sgl_quotes || in_dbl_quotes || jump_line{
+
+        if jump_line { 
+            print!("> ");
+        }else if in_dbl_quotes { 
+            print!("dquote> ");
+        } else {  
+            print!("quote> ");
         }
 
-    }   
+        io::stdout().flush().unwrap();
+
+        let mut new_input = String::new();
+
+        match io::stdin().read_line(&mut new_input) {
+            Ok(_) => {
+                jump_line = new_input.trim_end().ends_with('\\');
+                let line = if jump_line { new_input.trim_end().trim_end_matches('\\') } else { new_input.as_str() };
+
+                tokenize(line, &mut cmd, &mut buffer, &mut in_sgl_quotes, &mut in_dbl_quotes);
+            }
+
+            Err(e) => {
+                eprintln!("Error: {}", e);
+                return None;
+            }
+        }
+    }
+
+    if !buffer.is_empty() {
+        if cmd.name.is_empty() {
+            cmd.name = buffer.clone();
+        } else if buffer.starts_with('-') {
+            cmd.options.push_str(&buffer[1..]);
+        }else{
+            cmd.args.push(buffer.clone());
+        }
+    }
 
     Some(cmd)
 }
+//echo hello "hello" 'hello' "hello'hello" 'hello"hello' "hello sakjsnas"hello
