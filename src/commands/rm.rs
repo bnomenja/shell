@@ -10,6 +10,11 @@ pub fn run(args : &[String], options : &String) {
     let recursive = options.contains('r');
 
     for target in args {
+        if target == "." || target == ".." {
+            eprintln!("Error: for security purpose we are skipping '{}'", target);
+            continue;
+        }
+
         let path = Path::new(target);
 
         if !path.exists() {

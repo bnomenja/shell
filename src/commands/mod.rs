@@ -7,6 +7,7 @@ mod mv;
 mod cd;
 mod echo;
 mod ls;
+mod mkdir;
 
 use crate::parser::Command;
 
@@ -20,6 +21,7 @@ pub fn execute(cmd : Command) {
         "mv" => mv::run(&cmd.args, &cmd.options),
         "cd" => cd::run(&cmd.args),
         "echo" => echo::run(&cmd.args),
+        "mkdir" => mkdir::run(&cmd.args),
         "ls" => ls::run(&cmd.args, &cmd.options),
         unknown => println!("Command '{:?}' not found", unknown),
     }
