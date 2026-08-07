@@ -1,14 +1,13 @@
 mod parser;
 mod commands;
+mod helpers; 
 
 use std::io;
-use std::io::Write;
 
 fn main() {
     loop {
-        print!("$ ");
-        io::stdout().flush().unwrap();
-
+        helpers::print_propmpt();
+        
         let mut input = String::new();
 
         match io::stdin().read_line(&mut input) {

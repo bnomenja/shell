@@ -4,27 +4,6 @@ use std::os::unix::fs::{FileTypeExt, MetadataExt};
 use uzers::{get_user_by_uid, get_group_by_gid};
 use chrono::{DateTime, Local, TimeZone};
 
-fn sort(paths: &mut Vec<PathBuf>) {
-        paths.sort_by(|a, b| {
-        let a_meta = std::fs::metadata(a);
-        let b_meta = std::fs::metadata(b);
-
-        match (a_meta, b_meta) {
-            (Ok(a_m), Ok(b_m)) => {
-                let a_is_dir = a_m.is_dir();
-                let b_is_dir = b_m.is_dir();
-
-                match (a_is_dir, b_is_dir) {
-                    (false, true) => std::cmp::Ordering::Less,  
-                    (true, false) => std::cmp::Ordering::Greater,
-                    _ => a.cmp(b),
-                }
-            }
-            _ => a.cmp(b), 
-        }
-    });
-}
-
 fn indicator(path : &Path) -> &str {
     let metadata = match fs::symlink_metadata(path) {
         Ok(m) => m,
@@ -59,7 +38,6 @@ fn print_small(names : &Vec<String>, path:&Path, show_indicator : bool) {
         
         print!("{}{} ", name, suffix);
     });
-    println!();
 }
 
 #[derive(Debug)]
@@ -134,7 +112,12 @@ fn print_long(names : &Vec<String>, path:&Path, show_indicator : bool) {
             };
 
             let target_path = path.join(&target);
-            let suffix = if show_indicator { indicator(&target_path) }else {""};
+            let suffix = if show_indicator { 
+                let indic = indicator(&target_path);
+                if indic == "@" { "" }else{ indic }
+             }else {
+                ""
+            };
 
             format!("{} -> {}", name, target + suffix)
         }else if show_indicator{
@@ -158,7 +141,6 @@ fn print_long(names : &Vec<String>, path:&Path, show_indicator : bool) {
             mtime,
             name : formated_name,
         });
-
         total += metadata.blocks();
     });
 
@@ -173,7 +155,7 @@ fn print_long(names : &Vec<String>, path:&Path, show_indicator : bool) {
     println!("total {}", total);
 
     entries.iter().for_each(|e|println!(
-        "{}{} {:>nlink_width$} {:<owner_width$} {:<group_width$} {:>size_width$}, {:>date_width$} {}",
+        "{}{} {:>nlink_width$} {:<owner_width$} {:<group_width$} {:>size_width$} {:>date_width$} {}",
         e.typ, e.permissions, e.nlink, e.owner, e.group, e.size, format_mtime(e.mtime), e.name
     ));
 }
@@ -216,12 +198,11 @@ pub fn run(args : &[String], options: &String) {
         args.iter().map(PathBuf::from).collect()
     };    
 
-    sort(&mut paths);
+    paths.sort_by_key(|p| if p.is_dir(){ 1 }else{ 0 });
 
     let show_hidden = options.contains("a");
     let show_indicator = options.contains("F");
     let show_long = options.contains("l");
-    let mut last_was_file = false;
     
     for (i, path) in paths.iter().enumerate() {
         let mut names : Vec<String> = Vec::new();
@@ -230,7 +211,7 @@ pub fn run(args : &[String], options: &String) {
             eprintln!("Error: No such file or directory '{}'", path.display());
             continue;
         }
-
+        
         if !path.is_dir() {
             let suffix = if show_indicator {
                 indicator(&path)
@@ -240,17 +221,15 @@ pub fn run(args : &[String], options: &String) {
 
             print!("{}{} ", path.display(), suffix);
 
-            last_was_file = true;
+            // if i +1 < paths.len() && paths[i+1].is_dir(){
+            //     println!();
+            // }
+
             continue;
         } 
 
-        if paths.len() > 1 {
-            if last_was_file{
-                println!("\n\n{}:", path.display());
-                last_was_file = false;
-            }else{
-                println!("{}:", path.display());
-            }
+        if args.len() > 1 {
+            println!("{}:", path.display());
         }
         
         if show_hidden {
@@ -285,12 +264,5 @@ pub fn run(args : &[String], options: &String) {
         }else{
             print_small(&names,&path, show_indicator);
         }
-
-        if i != paths.len()-1 {
-            println!();
-        }
     }
-
-    if last_was_file { println!() };
 }
-

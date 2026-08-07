@@ -35,19 +35,25 @@ fn tokenize(input: &str, cmd: &mut Command, buffer: &mut String, in_sgl_quotes: 
 
             '"' if !*in_sgl_quotes => *in_dbl_quotes = !*in_dbl_quotes,
 
-            c if c.is_whitespace() && !*in_sgl_quotes && !*in_dbl_quotes => {
-                if !buffer.is_empty() {
-                    if cmd.name.is_empty() {
-                        cmd.name = buffer.clone();
-                    } else if buffer.starts_with('-') {
-                        cmd.options.push_str(&buffer[1..]);
-                    }else{
-                        cmd.args.push(buffer.clone());
-                    }
-                    buffer.clear();
-                }
-            }
+            '#' if buffer.is_empty() && !(*in_dbl_quotes || *in_sgl_quotes) => {
+                buffer.clear();
+                return;
+            },
 
+            c if c.is_whitespace() && !*in_sgl_quotes && !*in_dbl_quotes && !buffer.trim().is_empty() => {
+                let trimed = buffer.trim().to_string();
+
+                if cmd.name.is_empty() {
+                    cmd.name = trimed.clone();
+                } else if trimed.starts_with('-') {
+                    cmd.options.push_str(&trimed[1..]);
+                }else{
+                    cmd.args.push(trimed.clone());
+                }
+
+                buffer.clear();
+            }
+            
             c => buffer.push(c),
         }
     }
@@ -97,6 +103,7 @@ pub fn parse(input: &str) -> Option<Command> {
         }
     }
 
+    buffer = buffer.trim().to_string();
     if !buffer.is_empty() {
         if cmd.name.is_empty() {
             cmd.name = buffer.clone();
