@@ -4,6 +4,6 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-chrono = "0.4.41"
+jiff = "0.2.35"
 libc = "0.2.189"
 uzers = "0.12.2"

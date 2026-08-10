@@ -3,7 +3,7 @@ use std::path::Path;
 
 pub fn run(args : &[String], options : &String) {
     if args.is_empty() {
-        eprintln!("Error: missing operand");
+        eprintln!("\x1b[31mError: missing operand\x1b[0m");
         return;
     }
 
@@ -11,19 +11,19 @@ pub fn run(args : &[String], options : &String) {
 
     for target in args {
         if target == "." || target == ".." {
-            eprintln!("Error: for security purpose we are skipping '{}'", target);
+            eprintln!("\x1b[31mError: for security purpose we are skipping '{}'\x1b[0m", target);
             continue;
         }
 
         let path = Path::new(target);
 
         if !path.exists() {
-            eprintln!("Error: cannot remove '{}': No such file or directory", target);
+            eprintln!("\x1b[31mError: cannot remove '{}': No such file or directory\x1b[0m", target);
             continue;
         }
 
         if path.is_dir() && !recursive {
-            eprintln!("Error: cannot remove '{}': Is a directory", target);
+            eprintln!("\x1b[31mError: cannot remove '{}': Is a directory\x1b[0m", target);
             continue;
         }
 
@@ -34,7 +34,7 @@ pub fn run(args : &[String], options : &String) {
         };
 
         if let Err(e) = result {
-            eprintln!("Error: cannot remove '{}': {}", target, e);
+            eprintln!("\x1b[31mError: cannot remove '{}': {}\x1b[0m", target, e.kind());
         }
     }
 }

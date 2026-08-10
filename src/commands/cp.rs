@@ -4,8 +4,8 @@ use std::path::Path;
 pub fn run(args : &[String]) {
 
     match args.len() {
-        0 => eprintln!("Error: missing file operand"),
-        1 => eprintln!("Error: missing destination file operand after '{}'", args[0]),
+        0 => eprintln!("\x1b[31mError: missing file operand\x1b[0m"),
+        1 => eprintln!("\x1b[31mError: missing destination file operand after '{}'\x1b[0m", args[0]),
         
         2 => {
             let src = Path::new(&args[0]);
@@ -14,14 +14,14 @@ pub fn run(args : &[String]) {
 
             match copy(&src, &target) {
                 Ok(_) => {},
-                Err(err) => eprintln!("Error: {}", err),
+                Err(err) => eprintln!("\x1b[31mError: {}\x1b[0m", err.kind()),
             }
         },
 
         _ => {
             let dest = Path::new(args.last().unwrap());
             if !dest.is_dir() {
-                eprintln!("Error: destination must be a directory");
+                eprintln!("\x1b[31mError: destination must be a directory\x1b[0m");
                 return;
             }
 
@@ -29,7 +29,7 @@ pub fn run(args : &[String]) {
                 let file_name = match Path::new(src).file_name() {
                     Some(name) => name,
                     None => {
-                        eprintln!("Error: cannot determine filename for '{}'", src);
+                        eprintln!("\x1b[31mError: cannot determine filename for '{}'\x1b[0m", src);
                         continue;
                     }
                 };
@@ -38,7 +38,7 @@ pub fn run(args : &[String]) {
 
                 match copy(src, &target) {
                     Ok(_) => {},
-                    Err(err) => eprintln!("Error from : {}", err),
+                    Err(err) => eprintln!("\x1b[31mError from : {}\x1b[0m", err.kind()),
                 };
             }
         }
