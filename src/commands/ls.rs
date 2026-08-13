@@ -4,6 +4,7 @@ use std::fs::{FileType, Metadata};
 use std::os::unix::fs::{FileTypeExt, MetadataExt};
 use uzers::{get_user_by_uid, get_group_by_gid};
 use jiff::{Timestamp, tz::TimeZone};
+use crate::helpers;
 
 #[derive(Debug)]
 struct Entry {
@@ -29,7 +30,8 @@ pub fn run(args: &[String], options: &String) {
         directories.push(PathBuf::from("."));
     } else {
         for arg in args.iter() {
-            let path = PathBuf::from(arg);
+            let replaced = helpers::replace_tilda(arg);
+            let path = PathBuf::from(&replaced);
 
             if !path.exists() {
                 eprintln!("\x1b[31mError: No such file or directory '{}'\x1b[0m", path.display());
@@ -102,7 +104,7 @@ pub fn run(args: &[String], options: &String) {
                     }
                 }
             }
-            Err(err) => eprintln!("\x1b[31mError: {}\x1b[0m", err.kind()),
+            Err(err) => eprintln!("\x1b[31mError: {}\x1b[0m", err),
         }
 
         entries.sort_by_key(|e| sort_key(e));
@@ -225,7 +227,7 @@ fn sort_key(path: &PathBuf) -> String {
     if name == "." || name == ".." {
         name
     } else {
-        name.trim_start_matches('.').to_lowercase()
+        name.trim_start_matches('.').trim().to_lowercase()
     }
 }
 
@@ -350,6 +352,8 @@ pub fn format_permissions(mode :u32) -> String{
         (0o040, 'r'), (0o020, 'w'), (0o010, 'x'),
         (0o004, 'r'), (0o002, 'w'), (0o001, 'x'),
     ];
+
+    
 
     for (mask, c) in bits {
         permissions.push(if mode & mask != 0 { c }else{ '-' });

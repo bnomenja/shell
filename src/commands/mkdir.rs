@@ -1,3 +1,5 @@
+use crate::helpers;
+
 pub fn run(args: &[String]) {
     if args.is_empty() {
         eprintln!("\x1b[31mError: missing operand\x1b[0m");
@@ -5,7 +7,9 @@ pub fn run(args: &[String]) {
     }
 
     for dir in args {
-        if let Err(e) = std::fs::create_dir(dir) {
+        let real_path = helpers::replace_tilda(dir);
+
+        if let Err(e) = std::fs::create_dir(&real_path) {
             eprintln!("\x1b[31mError: {}\x1b[0m", e.kind());
         }
     }

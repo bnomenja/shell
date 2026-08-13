@@ -6,7 +6,7 @@ pub fn run(args : &[String]) {
 
     match std::env::current_dir() {
         Ok(path) => println!("{}", path.display()),
-        Err(err) => eprintln!("\x1b[31mError: {}\x1b[0m", err.kind()),
+        Err(err) => eprintln!("\x1b[31mError: {}\x1b[0m", err),
     };
 
 }

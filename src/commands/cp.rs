@@ -1,32 +1,66 @@
 use std::fs::copy;
-use std::path::Path;
+use std::path::{Path, PathBuf};
+use crate::helpers;
 
-pub fn run(args : &[String]) {
+fn is_same_file(a: &Path, b: &Path) -> bool {
+    match (a.canonicalize(), b.canonicalize()) {
+        (Ok(a), Ok(b)) => a == b,
+        _ => false,
+    }
+}
 
+pub fn run(args: &[String]) {
     match args.len() {
         0 => eprintln!("\x1b[31mError: missing file operand\x1b[0m"),
-        1 => eprintln!("\x1b[31mError: missing destination file operand after '{}'\x1b[0m", args[0]),
-        
-        2 => {
-            let src = Path::new(&args[0]);
-            let dest = Path::new(&args[1]);
-            let target = if dest.is_file() { dest }else { &dest.join(src.file_name().unwrap()) };
 
-            match copy(&src, &target) {
-                Ok(_) => {},
-                Err(err) => eprintln!("\x1b[31mError: {}\x1b[0m", err.kind()),
+        1 => eprintln!( "\x1b[31mError: missing destination file operand after '{}'\x1b[0m", args[0]),
+
+        2 => {
+            let src = helpers::replace_tilda(&args[0]);
+            let dest = helpers::replace_tilda(&args[1]);
+            
+            let src_path = Path::new(&src);
+            let dest_path = Path::new(&dest);
+
+            let file_name = match src_path.file_name() {
+                Some(name) => name,
+                None => {
+                    eprintln!("\x1b[31mError: cannot determine filename for '{}'\x1b[0m", args[0]);
+                    return;
+                }
+            };
+
+            let target_path: PathBuf = if dest_path.is_dir() {
+                dest_path.join(file_name)
+            } else {
+                dest_path.to_path_buf()
+            };
+
+            if is_same_file(src_path, &target_path) {
+                eprintln!("\x1b[31mError: '{}' and '{}' are the same file\x1b[0m",args[0], args[1]);
+                return;
             }
-        },
+
+            match copy(src_path, &target_path) {
+                Ok(_) => {}
+                Err(err) => eprintln!("\x1b[31mError: {}\x1b[0m", err),
+            }
+        }
 
         _ => {
-            let dest = Path::new(args.last().unwrap());
-            if !dest.is_dir() {
+            let dest =  helpers::replace_tilda(&args.last().unwrap());
+            let dest_path = Path::new(&dest);
+        
+            if !dest_path.is_dir() {
                 eprintln!("\x1b[31mError: destination must be a directory\x1b[0m");
                 return;
             }
 
-            for src in &args[..args.len()-1] {
-                let file_name = match Path::new(src).file_name() {
+            for src in &args[..args.len() - 1] {
+                let src = helpers::replace_tilda(src);
+                let src_path = Path::new(&src);
+
+                let file_name = match src_path.file_name() {
                     Some(name) => name,
                     None => {
                         eprintln!("\x1b[31mError: cannot determine filename for '{}'\x1b[0m", src);
@@ -34,15 +68,18 @@ pub fn run(args : &[String]) {
                     }
                 };
 
-                let target = dest.join(file_name);
+                let target = dest_path.join(file_name);
+
+                if is_same_file(&src_path, &target) {
+                    eprintln!("\x1b[31mError: '{}' and '{}' are the same file\x1b[0m", src, target.display());
+                    continue;
+                }
 
                 match copy(src, &target) {
-                    Ok(_) => {},
-                    Err(err) => eprintln!("\x1b[31mError from : {}\x1b[0m", err.kind()),
+                    Ok(_) => {}
+                    Err(err) => eprintln!("\x1b[31mError: {}\x1b[0m", err),
                 };
             }
         }
     }
-
-
 }

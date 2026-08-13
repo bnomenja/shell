@@ -5,6 +5,8 @@ mod helpers;
 use std::io;
 
 fn main() {
+    let mut old_pwd = helpers::formatted_current();
+
     loop {
         helpers::print_propmpt();
         
@@ -15,7 +17,7 @@ fn main() {
 
             Ok(_) => {
                 if let Some(cmd) = parser::parse(&input) {
-                    commands::execute(cmd);
+                    commands::execute(cmd, &mut old_pwd);
                 }
             }
 

@@ -1,5 +1,6 @@
 use std::fs;
 use std::path::Path;
+use crate::helpers;
 
 pub fn run(args : &[String], options : &String) {
     if args.is_empty() {
@@ -15,7 +16,8 @@ pub fn run(args : &[String], options : &String) {
             continue;
         }
 
-        let path = Path::new(target);
+        let replaced = helpers::replace_tilda(target);
+        let path = Path::new(&replaced);
 
         if !path.exists() {
             eprintln!("\x1b[31mError: cannot remove '{}': No such file or directory\x1b[0m", target);
