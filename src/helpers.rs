@@ -1,6 +1,7 @@
 use std::io::Write;
 use std::io;
 use std::env;
+use std::path::Path;
 
 pub fn print_propmpt() {
     const CYAN: &str = "\x1b[36m";
@@ -39,4 +40,11 @@ pub fn replace_tilda(src : &str) -> String{
     } 
     
     src.to_string()
+}
+
+pub fn is_same_file(a: &Path, b: &Path) -> bool {
+    match (a.canonicalize(), b.canonicalize()) {
+        (Ok(a), Ok(b)) => a == b,
+        _ => false,
+    }
 }

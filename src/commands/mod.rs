@@ -20,7 +20,7 @@ pub fn execute(cmd : Command, old_pwd : &mut String) {
         "exit" => exit::run(&cmd.args),
         "ls" => ls::run(&cmd.args, &cmd.options),
         "mkdir" => mkdir::run(&cmd.args),
-        "mv" => mv::run(&cmd.args, &cmd.options),
+        "mv" => mv::run(&cmd.args),
         "pwd" => pwd::run(&cmd.args),
         "rm" => rm::run(&cmd.args, &cmd.options),
         unknown => println!("command not found: {:?}", unknown),

@@ -2,13 +2,6 @@ use std::fs::copy;
 use std::path::{Path, PathBuf};
 use crate::helpers;
 
-fn is_same_file(a: &Path, b: &Path) -> bool {
-    match (a.canonicalize(), b.canonicalize()) {
-        (Ok(a), Ok(b)) => a == b,
-        _ => false,
-    }
-}
-
 pub fn run(args: &[String]) {
     match args.len() {
         0 => eprintln!("\x1b[31mError: missing file operand\x1b[0m"),
@@ -36,7 +29,7 @@ pub fn run(args: &[String]) {
                 dest_path.to_path_buf()
             };
 
-            if is_same_file(src_path, &target_path) {
+            if helpers::is_same_file(src_path, &target_path) {
                 eprintln!("\x1b[31mError: '{}' and '{}' are the same file\x1b[0m",args[0], args[1]);
                 return;
             }
@@ -70,12 +63,12 @@ pub fn run(args: &[String]) {
 
                 let target = dest_path.join(file_name);
 
-                if is_same_file(&src_path, &target) {
+                if helpers::is_same_file(&src_path, &target) {
                     eprintln!("\x1b[31mError: '{}' and '{}' are the same file\x1b[0m", src, target.display());
                     continue;
                 }
 
-                match copy(src, &target) {
+                match copy(&src_path, &target) {
                     Ok(_) => {}
                     Err(err) => eprintln!("\x1b[31mError: {}\x1b[0m", err),
                 };
