@@ -1,0 +1,12 @@
+/home/bnomenja/Desktop/shell/target/debug/deps/uzers-07750baaaeef2a5b.d: /home/bnomenja/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uzers-0.12.2/src/lib.rs /home/bnomenja/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uzers-0.12.2/src/base.rs /home/bnomenja/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uzers-0.12.2/src/cache.rs /home/bnomenja/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uzers-0.12.2/src/mock.rs /home/bnomenja/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uzers-0.12.2/src/switch.rs /home/bnomenja/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uzers-0.12.2/src/traits.rs
+
+/home/bnomenja/Desktop/shell/target/debug/deps/libuzers-07750baaaeef2a5b.rlib: /home/bnomenja/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uzers-0.12.2/src/lib.rs /home/bnomenja/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uzers-0.12.2/src/base.rs /home/bnomenja/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uzers-0.12.2/src/cache.rs /home/bnomenja/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uzers-0.12.2/src/mock.rs /home/bnomenja/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uzers-0.12.2/src/switch.rs /home/bnomenja/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uzers-0.12.2/src/traits.rs
+
+/home/bnomenja/Desktop/shell/target/debug/deps/libuzers-07750baaaeef2a5b.rmeta: /home/bnomenja/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uzers-0.12.2/src/lib.rs /home/bnomenja/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uzers-0.12.2/src/base.rs /home/bnomenja/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uzers-0.12.2/src/cache.rs /home/bnomenja/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uzers-0.12.2/src/mock.rs /home/bnomenja/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uzers-0.12.2/src/switch.rs /home/bnomenja/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uzers-0.12.2/src/traits.rs
+
+/home/bnomenja/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uzers-0.12.2/src/lib.rs:
+/home/bnomenja/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uzers-0.12.2/src/base.rs:
+/home/bnomenja/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uzers-0.12.2/src/cache.rs:
+/home/bnomenja/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uzers-0.12.2/src/mock.rs:
+/home/bnomenja/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uzers-0.12.2/src/switch.rs:
+/home/bnomenja/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uzers-0.12.2/src/traits.rs:

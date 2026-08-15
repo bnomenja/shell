@@ -19,7 +19,7 @@ pub fn run(args: &[String], old_pwd: &mut String) {
         }
 
         _ => {
-            eprintln!("\x1b[31mError: too much arguments\x1b[0m");
+            eprintln!("\x1b[31mError: too many arguments\x1b[0m");
             return;
         }
     };

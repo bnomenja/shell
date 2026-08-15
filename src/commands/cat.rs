@@ -4,8 +4,18 @@ use crate::helpers;
 
 pub fn run(args : &[String]) {
     if args.is_empty() {
-        println!("\x1b[31mError: no file to display specified\x1b[0m");
-        return
+        loop {            
+            let mut input = String::new();
+            match io::stdin().read_line(&mut input) {
+                Ok(0) => std::process::exit(0),
+
+                Ok(_) => {
+                    print!("{}", input);
+                }
+
+                Err(e) => eprintln!("Error: {}", e),
+            }
+        }
     }
 
     let mut last_byte : u8 = b'\n';

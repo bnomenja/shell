@@ -40,8 +40,6 @@ pub fn run(args: &[String]) {
                     continue;
                 }
 
-                println!("{} {}", src_path.display(), target.display());
-
                 match rename(&src_path, &target) {
                     Ok(_) => {}
                     Err(err) => eprintln!("\x1b[31mError: {}\x1b[0m", err),

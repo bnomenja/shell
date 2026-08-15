@@ -1,6 +1,6 @@
 use std::path::{Path, PathBuf};
-use std::fs;
-use std::fs::{FileType, Metadata};
+use std::io::ErrorKind;
+use std::fs::{self, FileType, Metadata};
 use std::os::unix::fs::{FileTypeExt, MetadataExt};
 use uzers::{get_user_by_uid, get_group_by_gid};
 use jiff::{Timestamp, tz::TimeZone};
@@ -33,9 +33,20 @@ pub fn run(args: &[String], options: &String) {
             let replaced = helpers::replace_tilda(arg);
             let path = PathBuf::from(&replaced);
 
-            if !path.exists() {
-                eprintln!("\x1b[31mError: No such file or directory '{}'\x1b[0m", path.display());
-                continue;
+            if let Err(err) = fs::metadata(&path) {
+                
+                match err.kind() {
+                    ErrorKind::NotFound => {
+                        println!("\x1b[31mError: No such file or directory '{}'\x1b[0m", path.display());
+                        continue;
+                    }
+                    _ => {
+                        if  !show_indicator && !show_long {
+                            println!("\x1b[31mError: Too many levels of symbolic links '{}'\x1b[0m", path.display());
+                            continue;
+                        }
+                    }
+                }
             }
 
             let treat_as_dir = if show_indicator || show_long {
@@ -100,11 +111,17 @@ pub fn run(args: &[String], options: &String) {
 
                             entries.push(entry_path);
                         }
-                        Err(e) => eprintln!("Error: {}", e.kind()),
+                        Err(e) => {
+                            eprintln!("Error: {}", e);
+                            continue;
+                        },
                     }
                 }
             }
-            Err(err) => eprintln!("\x1b[31mError: {}\x1b[0m", err),
+            Err(err) => {
+                eprintln!("\x1b[31mError: {}\x1b[0m", err);
+                continue;
+            },
         }
 
         entries.sort_by_key(|e| sort_key(e));
@@ -352,6 +369,7 @@ pub fn format_permissions(mode :u32) -> String{
         (0o040, 'r'), (0o020, 'w'), (0o010, 'x'),
         (0o004, 'r'), (0o002, 'w'), (0o001, 'x'),
     ];
+
 
     
 
