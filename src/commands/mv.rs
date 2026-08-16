@@ -24,7 +24,7 @@ pub fn run(args: &[String]) {
                 let file_name = match src_path.file_name() {
                     Some(name) => name,
                     None => {
-                        eprintln!("\x1b[31mError: cannot determine filename for '{}'\x1b[0m", src);
+                        eprintln!("\x1b[31mError: cannot determine name for '{}'\x1b[0m", src);
                         continue;
                     }
                 };

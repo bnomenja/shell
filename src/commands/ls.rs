@@ -33,36 +33,61 @@ pub fn run(args: &[String], options: &String) {
             let replaced = helpers::replace_tilda(arg);
             let path = PathBuf::from(&replaced);
 
-            if let Err(err) = fs::metadata(&path) {
-                
-                match err.kind() {
-                    ErrorKind::NotFound => {
-                        println!("\x1b[31mError: No such file or directory '{}'\x1b[0m", path.display());
-                        continue;
-                    }
-                    _ => {
-                        if  !show_indicator && !show_long {
-                            println!("\x1b[31mError: Too many levels of symbolic links '{}'\x1b[0m", path.display());
-                            continue;
+            let sym_metadata = match fs::symlink_metadata(&path) {
+                Ok(m) => m,
+
+                Err(e) => {
+                    match e.kind() {
+                        ErrorKind::NotFound => {
+                            println!("\x1b[31mError: No such file or directory '{}'\x1b[0m", path.display());
+                        }
+
+                        _ => {
+                            println!("\x1b[31mError: {}\x1b[0m", e);
                         }
                     }
-                }
-            }
 
-            let treat_as_dir = if show_indicator || show_long {
-                match fs::symlink_metadata(&path) {
-                    Ok(data) => data.file_type().is_dir(),
-                    Err(_) => false,
+                    continue;
                 }
-            } else {
-                path.is_dir()
             };
 
-            if treat_as_dir {
+            if sym_metadata.file_type().is_dir() {
                 directories.push(path);
-            } else {
+            } else if sym_metadata.file_type().is_symlink() {
+
+                if show_indicator || show_long {
+                    files.push(path);
+                    continue;
+                }
+
+                let metadata = match fs::metadata(&path) {
+                    Ok(m) => m,
+
+                    Err(e) => {
+                        match e.kind() {
+                            ErrorKind::NotFound => {
+                                println!("\x1b[31mError: No such file or directory '{}'\x1b[0m", path.display());
+                                //files.push(path);
+                            }
+
+                            _ => {
+                                println!("\x1b[31mError: {}\x1b[0m", e);
+                            }
+                        }
+                        continue;
+                    }
+                };
+
+                if metadata.is_dir() {
+                    directories.push(path);
+                }else {
+                    files.push(path);
+                }
+
+            }else{
                 files.push(path);
             }
+            
         }
     }
 
@@ -172,7 +197,10 @@ fn print_long(entries: &[PathBuf], show_indicator: bool, show_total: bool) {
     for entry_path in entries.iter() {
         let metadata = match fs::symlink_metadata(entry_path) {
             Ok(mdata) => mdata,
-            Err(_) => continue,
+            Err(err ) => {
+                eprintln!("\x1b[31mError for: '{}', {}\x1b[0m", entry_path.display(), err);
+                continue;
+            },
         };
 
         let typ = get_type(&metadata.file_type());
@@ -196,7 +224,7 @@ fn print_long(entries: &[PathBuf], show_indicator: bool, show_total: bool) {
     let nlink_width = formatted_entries.iter().map(|e| e.nlink.to_string().len()).max().unwrap_or(0);
     let owner_width = formatted_entries.iter().map(|e| e.owner.chars().count()).max().unwrap_or(0);
     let group_width = formatted_entries.iter().map(|e| e.group.chars().count()).max().unwrap_or(0);
-    let size_width = formatted_entries.iter().map(|e| e.size.len()).max().unwrap_or(0);
+    let size_width = formatted_entries.iter().map(|e| e.size.chars().count()).max().unwrap_or(0);
 
     if show_total {
         println!("total {}", total);
@@ -369,9 +397,6 @@ pub fn format_permissions(mode :u32) -> String{
         (0o040, 'r'), (0o020, 'w'), (0o010, 'x'),
         (0o004, 'r'), (0o002, 'w'), (0o001, 'x'),
     ];
-
-
-    
 
     for (mask, c) in bits {
         permissions.push(if mode & mask != 0 { c }else{ '-' });

@@ -23,9 +23,11 @@ pub fn parse(input: &str) -> Option<Command> {
     }
     
     let mut cmd = Command::new();
+
     let mut in_sgl_quotes = false;
     let mut in_dbl_quotes = false;
     let mut options_end = false;
+
     let mut buffer = String::new();
     let mut jump_line = input.trim_end().ends_with('\\');
     
@@ -51,13 +53,11 @@ pub fn parse(input: &str) -> Option<Command> {
         let mut new_input = String::new();
         
         match io::stdin().read_line(&mut new_input) {
-            Ok(0) => {
-                println!("\x1b[31msyntax error: unterminated quoted string\x1b[0m");
-                return None;
-            },
+            Ok(0) => { return None  },
 
             Ok(_) => {
                 jump_line = new_input.trim_end().ends_with('\\');
+
                 let line = if jump_line {
                     new_input.trim_end().trim_end_matches('\\')
                 } else {
@@ -123,6 +123,7 @@ fn tokenize(
 
 fn flush_token(cmd: &mut Command, buffer: &mut String, options_end: &mut bool) {
     let trimed = buffer.trim().to_string();
+    
     if trimed.is_empty() {
         buffer.clear();
         return;

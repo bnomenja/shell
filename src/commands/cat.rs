@@ -13,7 +13,7 @@ pub fn run(args : &[String]) {
                     print!("{}", input);
                 }
 
-                Err(e) => eprintln!("Error: {}", e),
+                Err(e) => eprintln!("\x1b[31mError: {}\x1b[0m", e),
             }
         }
     }

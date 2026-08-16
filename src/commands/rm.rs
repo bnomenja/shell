@@ -11,7 +11,7 @@ pub fn run(args : &[String], options : &String) {
     let recursive = options.contains('r');
 
     for target in args {
-        if target == "." || target == ".." {
+        if target == "." || target.ends_with("/.") || target == ".." || target.ends_with("/..")  || target == "/"{
             eprintln!("\x1b[31mError: for security purpose we are skipping '{}'\x1b[0m", target);
             continue;
         }

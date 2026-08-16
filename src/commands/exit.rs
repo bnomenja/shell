@@ -17,7 +17,8 @@ pub fn run(args : &[String]) {
 
                 Err(err) => {
                     match err.kind() {
-                        IntErrorKind::PosOverflow | IntErrorKind::NegOverflow  => 255,
+                        IntErrorKind::PosOverflow => 255,
+
                         _ => {
                             eprintln!("\x1b[31mError: invalid argument\x1b[0m");
                             return

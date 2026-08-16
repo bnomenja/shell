@@ -11,8 +11,6 @@ fn escape_if_needed(s: &str) -> String {
         match chars.next() {
             Some('n') => res.push('\n'),
             Some('t') => res.push('\t'),
-            Some('r') => res.push('\r'),
-            Some('0') => res.push('\0'),
             Some('\\') => res.push('\\'),
             Some(other) => {
                 res.push('\\');
@@ -30,7 +28,6 @@ pub fn run(args : &[String]) {
         println!();
         return;
     }
-
 
     for (i, w) in args.iter().enumerate(){
         let formated = escape_if_needed(&w);
