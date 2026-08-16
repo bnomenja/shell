@@ -48,7 +48,10 @@ pub fn parse(input: &str) -> Option<Command> {
             print!("quote> ");
         }
         
-        io::stdout().flush().unwrap();
+         if let Err(e) = io::stdout().flush() {
+            eprintln!("\x1b[31mError: {}\x1b[0m", e);
+            return None;
+        }
         
         let mut new_input = String::new();
         

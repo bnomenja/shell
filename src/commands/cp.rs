@@ -9,7 +9,7 @@ pub fn run(args: &[String]) {
         1 => eprintln!( "\x1b[31mError: missing destination file operand after '{}'\x1b[0m", args[0]),
 
         _ => {
-            let dest =  helpers::replace_tilda(&args.last().unwrap());
+            let dest =  helpers::replace_tilda(&args[args.len() - 1]);
             let dest_path = Path::new(&dest);
         
             if args.len() > 2 && !dest_path.is_dir() {

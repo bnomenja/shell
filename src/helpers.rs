@@ -9,7 +9,10 @@ pub fn print_propmpt() {
     let current_dir = formatted_current();
 
     print!("{}{}{}$ ",CYAN, current_dir, RESET);
-    io::stdout().flush().unwrap();
+
+    if let Err(e) = io::stdout().flush() {
+        eprintln!("\x1b[31mError: {}\x1b[0m", e);
+    }
 }
 
 pub fn formatted_current() -> String {
