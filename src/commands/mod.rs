@@ -8,6 +8,8 @@ mod cd;
 mod echo;
 mod ls;
 mod mkdir;
+mod help;
+mod touch;
 
 use crate::parser::Command;
 
@@ -18,8 +20,10 @@ pub fn execute(cmd : Command, old_pwd : &mut String) {
         "cp" => cp::run(&cmd.args),
         "echo" => echo::run(&cmd.args),
         "exit" => exit::run(&cmd.args),
+        "help" => help::run(&cmd.args),
         "ls" => ls::run(&cmd.args, &cmd.options),
         "mkdir" => mkdir::run(&cmd.args),
+        "touch" => touch::run(&cmd.args),
         "mv" => mv::run(&cmd.args),
         "pwd" => pwd::run(&cmd.args),
         "rm" => rm::run(&cmd.args, &cmd.options),
